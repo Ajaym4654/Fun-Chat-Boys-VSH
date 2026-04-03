@@ -1,0 +1,19 @@
+{
+  "name": "anon-fun-chat",
+  "version": "1.0.0",
+  "description": "A simple anonymous group chat with file sharing and no persistence.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.7.5",
+    "mime-types": "^2.1.35"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

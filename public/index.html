@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anon Fun Chat</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">💬 VSH Fun Chat</div>
+      <div class="meta">
+        <span class="live-dot"></span> Live — Nothing is saved
+      </div>
+    </header>
+
+    <main id="chatArea" aria-live="polite" aria-label="Group chat messages"></main>
+
+    <form id="controls" autocomplete="off">
+      <div class="row">
+        <input id="name" type="text" placeholder="Name (optional)" maxlength="20" />
+        <div class="emoji-picker" id="emojiPicker" aria-hidden="true"></div>
+      </div>
+
+      <div class="row">
+        <textarea id="msg" rows="1" placeholder="Type a message… (press Enter to send)" maxlength="2000"></textarea>
+        <button type="button" id="emojiBtn" title="Emoji">😊</button>
+        <label class="fileLabel" title="Send a file">
+          📎
+          <input id="fileInput" type="file" hidden />
+        </label>
+        <button id="sendBtn" class="send" type="submit">Send</button>
+      </div>
+
+      <div id="fileQueue" class="file-queue" aria-live="polite"></div>
+    </form>
+
+    <footer>
+      <small>For fun only · No accounts · No history · Files auto-expire · Be nice ✨</small>
+    </footer>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
