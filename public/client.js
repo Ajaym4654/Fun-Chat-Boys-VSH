@@ -205,3 +205,89 @@ function fmtSize(n) {
   while (v>=1024 && i<units.length-1) { v/=1024; i++; }
   return `${v.toFixed( (i===0)?0:1 )} ${units[i]}`;
 }
+
+
+
+const socket = io();
+
+// UI Elements
+const chatArea = document.getElementById('chatArea');
+const msgForm = document.getElementById('controls');
+const msgInput = document.getElementById('msgInput');
+const nameInput = document.getElementById('userName');
+const typingIndicator = document.getElementById('typingIndicator');
+const muteBtn = document.getElementById('muteBtn');
+
+// Audio setup
+const popSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+let isMuted = false;
+
+// Generate consistent colors for avatars
+const getAvatarColor = (name) => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    return `hsl(${hash % 360}, 60%, 55%)`;
+};
+
+// Toggle Mute
+muteBtn.addEventListener('click', () => {
+    isMuted = !isMuted;
+    muteBtn.textContent = isMuted ? '' : '🔊';
+});
+
+// Handle Sending
+msgForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const msg = msgInput.value.trim();
+    const name = nameInput.value.trim() || 'Anon';
+
+    if (msg) {
+        socket.emit('chatMessage', { name, text: msg });
+        msgInput.value = '';
+        socket.emit('stopTyping');
+    }
+});
+
+// Typing Logic
+msgInput.addEventListener('input', () => {
+    socket.emit('typing', nameInput.value || 'Someone');
+});
+
+// Receive Messages
+socket.on('message', (data) => {
+    const isSelf = data.name === (nameInput.value || 'Anon');
+    
+    const div = document.createElement('div');
+    div.className = `msg-row ${isSelf ? 'self' : ''}`;
+    
+    const color = getAvatarColor(data.name);
+    const initial = data.name.charAt(0).toUpperCase();
+
+    div.innerHTML = `
+        <div class="avatar" style="background: ${color}">${initial}</div>
+        <div class="bubble">
+            <span class="user-name">${data.name}</span>
+            <div class="body">${data.text}</div>
+        </div>
+    `;
+
+    chatArea.appendChild(div);
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    // Play sound
+    if (!isMuted && !isSelf) {
+        popSound.play().catch(() => {});
+    }
+});
+
+// Receive Typing
+let typingTimeout;
+socket.on('displayTyping', (name) => {
+    typingIndicator.textContent = `${name} is typing...`;
+    typingIndicator.style.opacity = '1';
+    
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+        typingIndicator.style.opacity = '0';
+    }, 2000);
+});
